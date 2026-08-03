@@ -1,0 +1,17 @@
+[package]
+name = "itaberry"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rppal = { version = "0.22.1", features = ["embedded-hal"] }
+mipidsi = "0.10.0"
+embedded-graphics = "0.8.1"
+image = "0.25.10"
+linux-embedded-hal = "0.4.1"
+spidev = "0.6.1"
+tinybmp = "0.7.0"
+gif = "0.14.2"
+toml = "1.1.3"
+serde = { version = "1.0.229", features = ["derive"] }
+thiserror = "2.0.19"
