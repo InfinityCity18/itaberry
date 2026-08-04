@@ -1,5 +1,5 @@
 use embedded_graphics::pixelcolor::{Rgb565, raw::RawU16};
-use image::{DynamicImage, GenericImageView, ImageError};
+use image::{GenericImageView, ImageError};
 use std::{
     ffi::OsStr,
     format,

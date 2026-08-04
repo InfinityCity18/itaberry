@@ -1,16 +1,20 @@
 mod anydisplay;
 mod displaybuild;
 
+use std::path::Path;
+
 use displaybuild::DisplayConfig;
 use mipidsi::{
     interface::{InterfacePixelFormat, SpiInterface},
-    models::{GC9A01, Model, ST7789},
+    models::Model,
 };
 use rppal::gpio;
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::display::{anydisplay::AnyDisplay, displaybuild::BuildDisplayError};
+use crate::display::{
+    anydisplay::AnyDisplay,
+    displaybuild::{BuildDisplayError, DisplayConfigRoot},
+};
 
 struct Display<'a, MODEL>
 where
@@ -25,10 +29,13 @@ where
     >,
 }
 
-pub fn load_displays_from_config(path: &str) -> Result<Vec<Box<dyn AnyDisplay>>, DisplayLoadError> {
+pub fn load_displays_from_config(
+    path: &Path,
+) -> Result<Vec<Box<dyn AnyDisplay>>, DisplayLoadError> {
     let file_content_string = std::fs::read_to_string(path)?;
-    let display_configs: Vec<DisplayConfig> = toml::from_str(&file_content_string)?;
+    let display_configs: DisplayConfigRoot = toml::from_str(&file_content_string)?;
     let displays: Vec<Box<dyn AnyDisplay>> = display_configs
+        .displayconfig
         .into_iter()
         .map(|conf| {
             let id = conf.id;
@@ -39,7 +46,7 @@ pub fn load_displays_from_config(path: &str) -> Result<Vec<Box<dyn AnyDisplay>>,
 }
 
 #[derive(Error, Debug)]
-enum DisplayLoadError {
+pub enum DisplayLoadError {
     #[error("Failed to open config file")]
     Io(#[from] std::io::Error),
     #[error("Failed to parse toml config")]

@@ -3,14 +3,11 @@ use crate::display::Display;
 use super::anydisplay::AnyDisplay;
 use linux_embedded_hal::SpidevDevice;
 use mipidsi::{
-    Builder, InitError,
-    interface::{InterfacePixelFormat, SpiInterface},
-    models::{GC9A01, Model, ST7789},
+    Builder,
+    interface::SpiInterface,
+    models::{GC9A01, ST7789},
 };
-use rppal::{
-    gpio::{self, Gpio},
-    hal::Delay,
-};
+use rppal::{gpio::Gpio, hal::Delay};
 use serde::{Deserialize, Serialize};
 use spidev::{SpiModeFlags, Spidev, SpidevOptions};
 use thiserror::Error;
@@ -75,7 +72,13 @@ fn create_spidev(conf: &DisplayConfig) -> Result<Spidev, SpidevError> {
     Ok(spi)
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct DisplayConfigRoot {
+    #[serde(rename = "DisplayConfig")]
+    pub displayconfig: Vec<DisplayConfig>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DisplayConfig {
     pub id: i32,
     model: DisplayModelConfig,
@@ -143,4 +146,4 @@ pub enum BuildDisplayError {
 #[derive(Debug, Error)]
 #[error(transparent)]
 
-struct SpidevError(#[from] std::io::Error);
+pub struct SpidevError(#[from] std::io::Error);

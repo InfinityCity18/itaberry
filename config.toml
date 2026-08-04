@@ -1,0 +1,13 @@
+[[DisplayConfig]]
+id = 2
+model = "GC9A01"
+reset_pin = 3
+dc_pin = 2
+controller_id = 3
+chipselect_id = 3
+display_size = [1, 2]
+display_offset = [1, 2]
+inversion = "Normal"
+color_order = "Rgb"
+orientation.rotation = "Deg0"
+orientation.mirrored = false

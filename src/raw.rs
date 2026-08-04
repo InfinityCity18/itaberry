@@ -1,4 +1,4 @@
 mod gif;
 mod image;
 
-pub use image::{RawImage, RawImageError};
+pub use image::RawImage;

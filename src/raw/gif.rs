@@ -1,4 +1,4 @@
-use embedded_graphics::pixelcolor::{Rgb565, RgbColor, raw::RawU16};
+use embedded_graphics::pixelcolor::{Rgb565, RgbColor};
 use gif::DecodingError;
 use std::{
     ffi::OsStr,

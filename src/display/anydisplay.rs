@@ -1,11 +1,10 @@
-use std::todo;
 
 use crate::raw::RawImage;
 
 use super::Display;
 use embedded_graphics::Drawable;
 use embedded_graphics::draw_target::DrawTarget;
-use embedded_graphics::geometry::{Dimensions, OriginDimensions, Point, Size};
+use embedded_graphics::geometry::{OriginDimensions, Point, Size};
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::primitives::Rectangle;
 use mipidsi::interface::InterfacePixelFormat;
