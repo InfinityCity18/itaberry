@@ -86,7 +86,9 @@ pub struct DisplayConfig {
     dc_pin: u8,
     controller_id: u8,
     chipselect_id: u8,
+    #[serde(default = "zero_tuple")]
     display_size: (u16, u16),
+    #[serde(default = "zero_tuple")]
     display_offset: (u16, u16),
     #[serde(with = "ColorInversionDef")]
     inversion: mipidsi::options::ColorInversion,
@@ -94,6 +96,10 @@ pub struct DisplayConfig {
     color_order: mipidsi::options::ColorOrder,
     #[serde(with = "OrientationDef")]
     orientation: mipidsi::options::Orientation,
+}
+
+fn zero_tuple() -> (u16, u16) {
+    (0, 0)
 }
 
 #[derive(Serialize, Deserialize)]
