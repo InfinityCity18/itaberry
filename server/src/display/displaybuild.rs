@@ -1,4 +1,8 @@
-use crate::display::Display;
+use crate::{
+    constants::{BUFFER_SIZE, SPI_CLOCK_SPEED_HZ},
+    display::Display,
+    webserver::DisplayConfigWeb,
+};
 
 use super::anydisplay::AnyDisplay;
 use linux_embedded_hal::SpidevDevice;
@@ -11,9 +15,6 @@ use rppal::{gpio::Gpio, hal::Delay};
 use serde::{Deserialize, Serialize};
 use spidev::{SpiModeFlags, Spidev, SpidevOptions};
 use thiserror::Error;
-
-const SPI_CLOCK_SPEED_HZ: u32 = 60_000_000;
-const BUFFER_SIZE: usize = 4096;
 
 impl DisplayConfig {
     pub fn build_display(self, id: i32) -> Result<Box<dyn AnyDisplay>, BuildDisplayError> {
@@ -97,6 +98,16 @@ pub struct DisplayConfig {
     orientation: mipidsi::options::Orientation,
 }
 
+impl From<DisplayConfig> for DisplayConfigWeb {
+    fn from(value: DisplayConfig) -> Self {
+        DisplayConfigWeb {
+            id: value.id,
+            model: value.model.into(),
+            display_size: value.display_size
+        }
+    }
+}
+
 fn zero_tuple() -> (u16, u16) {
     (0, 0)
 }
@@ -136,6 +147,15 @@ pub enum RotationDef {
 pub enum DisplayModelConfig {
     Gc9a01,
     St7789,
+}
+
+impl Into<String> for DisplayModelConfig {
+    fn into(self) -> String {
+        match self {
+            DisplayModelConfig::Gc9a01 => String::from("GC9A01"),
+            DisplayModelConfig::St7789 => String::from("ST7789"),
+        }
+    }
 }
 
 #[derive(Debug, Error)]

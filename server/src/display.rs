@@ -11,10 +11,14 @@ use mipidsi::{
 use rppal::gpio;
 use thiserror::Error;
 
-use crate::display::{
+pub use crate::display::{
     anydisplay::AnyDisplay,
     displaybuild::{BuildDisplayError, DisplayConfigRoot},
 };
+
+pub struct FakeDisplay {
+    pub id: i32,
+}
 
 struct Display<'a, MODEL>
 where

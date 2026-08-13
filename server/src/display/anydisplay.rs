@@ -1,3 +1,4 @@
+use crate::display::FakeDisplay;
 use crate::raw::RawImage;
 
 use super::Display;
@@ -17,6 +18,27 @@ pub trait AnyDisplay {
     fn display_test_image(&mut self) -> Result<(), DisplayError>;
     fn clear_display(&mut self, color: Rgb565) -> Result<(), DisplayError>;
     fn display_image(&mut self, img: &RawImage) -> Result<(), DisplayError>;
+}
+
+impl AnyDisplay for FakeDisplay {
+    fn id(&self) -> i32 {
+        self.id
+    }
+
+    fn display_test_image(&mut self) -> Result<(), DisplayError> {
+        tracing::debug!("Test image display with id: {}", self.id);
+        Ok(())
+    }
+
+    fn clear_display(&mut self, color: Rgb565) -> Result<(), DisplayError> {
+        tracing::debug!("Cleared display with id: {}", self.id);
+        Ok(())
+    }
+
+    fn display_image(&mut self, img: &RawImage) -> Result<(), DisplayError> {
+        tracing::debug!("Displaying image on display id: {}", self.id);
+        Ok(())
+    }
 }
 
 impl<'a, MODEL> AnyDisplay for Display<'a, MODEL>

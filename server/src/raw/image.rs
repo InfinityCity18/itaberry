@@ -3,6 +3,7 @@ use image::{GenericImageView, ImageError};
 use std::{
     ffi::OsStr,
     format,
+    fs::create_dir_all,
     io::Write,
     path::{Path, PathBuf},
 };
@@ -20,14 +21,15 @@ pub fn create_raw(
 ) -> Result<PathBuf, RawImageError> {
     let img = image::ImageReader::open(og_img_path)?.decode()?;
     let mut filename = og_img_path
-        .file_name()
+        .file_prefix()
         .ok_or(RawImageError::Filename)?
         .to_owned();
     filename.push(OsStr::new(&format!(
         "_{}x{}.raw",
         target_width, target_height
     )));
-    let output_path = Path::new(ROOT_DIR).join(RAW_DIR).join(filename);
+    let out_dir = Path::new(&*ROOT_DIR).join(RAW_DIR);
+    let output_path = out_dir.join(filename);
 
     let resized = img.resize_to_fill(
         target_width,

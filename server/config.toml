@@ -5,6 +5,7 @@ reset_pin = 3
 dc_pin = 2
 controller_id = 3
 chipselect_id = 3
+display_size = [240, 240]
 inversion = "Normal"
 color_order = "Rgb"
 orientation.rotation = "Deg0"

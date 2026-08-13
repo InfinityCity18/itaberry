@@ -2,6 +2,8 @@ use embedded_graphics::pixelcolor::{Rgb565, RgbColor};
 use gif::DecodingError;
 use std::{
     ffi::OsStr,
+    fs::create_dir_all,
+    io::ErrorKind,
     path::{Path, PathBuf},
     process::{Command, ExitStatus},
 };
@@ -22,14 +24,15 @@ pub fn create_resize(
 ) -> Result<PathBuf, RawGifError> {
     //gifsicle --resize-fit 240x240 input.gif -o scaled_240x240.gif
     let mut filename = og_gif_path
-        .file_name()
+        .file_prefix()
         .ok_or(RawGifError::Filename)?
         .to_owned();
     filename.push(OsStr::new(&format!(
         "_{}x{}.gif",
         target_width, target_height
     )));
-    let out_path = Path::new(ROOT_DIR).join(RAW_DIR).join(filename);
+    let out_dir = Path::new(&*ROOT_DIR).join(RAW_DIR);
+    let out_path = out_dir.join(filename);
     let status = Command::new("gifsicle")
         .arg("--resize-fit")
         .arg(format!("{}x{}", target_width, target_height))
