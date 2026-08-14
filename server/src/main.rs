@@ -21,7 +21,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .init();
     let mut displays: Vec<Box<FakeDisplay>> =
         (1..5).map(|id| Box::new(FakeDisplay { id })).collect();
-    displays.iter_mut().next().unwrap().display_test_image()?;
     webserver::webserver_main().await?;
     Ok(())
 }

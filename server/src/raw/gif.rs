@@ -8,6 +8,7 @@ use std::{
     process::{Command, ExitStatus},
 };
 use thiserror::Error;
+use tracing::{instrument, warn};
 
 use crate::{
     constants::{RAW_DIR, ROOT_DIR},
@@ -18,6 +19,7 @@ pub struct RawGif {
     pub frames: Vec<(RawImage, u64)>,
 }
 
+#[instrument]
 pub fn create_resize(
     og_gif_path: &Path,
     (target_width, target_height): (u32, u32),
@@ -41,6 +43,7 @@ pub fn create_resize(
         .arg(&out_path)
         .status()?;
     if !status.success() {
+        warn!("Gifsicle failed");
         return Err(RawGifError::Gifsicle(status));
     }
     Ok(out_path)

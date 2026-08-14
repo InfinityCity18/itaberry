@@ -8,7 +8,7 @@ use std::{
 };
 
 use tokio::sync::oneshot;
-use tracing::{error, trace, warn};
+use tracing::{error, info, trace, warn};
 
 use crate::{
     constants::ROOT_DIR,
@@ -30,11 +30,16 @@ pub fn display_thread(
         .into_iter()
         .map(|conf| Arc::new(Mutex::new(conf.into())))
         .collect();
-    let displays = load_displays_from_config(&Path::new(&*ROOT_DIR).join("config.toml"))?;
+
+    //let displays = load_displays_from_config(&Path::new(&*ROOT_DIR).join("config.toml"))?;
+    let displays: Vec<Box<crate::display::FakeDisplay>> = (2..3)
+        .map(|id| Box::new(crate::display::FakeDisplay { id }))
+        .collect();
     let mut worker_channels: HashMap<i32, mpsc::Sender<String>> = HashMap::new();
     for (disp, conf) in displays.into_iter().zip(configs.iter()) {
         let arc = conf.clone();
         let (tx, rx) = mpsc::channel();
+        assert_eq!(conf.lock().unwrap().id, disp.id);
         if worker_channels.insert(disp.id(), tx).is_some() {
             warn!("Displays were assigned equal ids, overwritten display may not receive commands");
         }
@@ -78,7 +83,11 @@ fn worker_thread(
         } else {
             rx.recv().unwrap()
         };
-        trace!("Worker thread with id: {} got task", disp.id());
+        info!(
+            "Worker thread with id: {} got task -> {}",
+            disp.id(),
+            filename
+        );
         match get_raw(&filename, disp.size()) {
             Ok(rawfile) => {
                 conf.lock().unwrap().current_image = Some(filename);

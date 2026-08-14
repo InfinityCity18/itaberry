@@ -1,10 +1,10 @@
 mod gif;
 mod image;
 
-use std::{error::Error, path::Path};
+use std::{error::Error, io::ErrorKind, path::Path};
 
 pub use image::RawImage;
-use tracing::warn;
+use tracing::{info, warn};
 
 use crate::{
     constants::{OG_DIR, ROOT_DIR},
@@ -34,10 +34,19 @@ pub fn get_raw(filename: &str, size: (u32, u32)) -> Result<RawFile, Box<dyn Erro
         match RawGif::open(&filn) {
             Ok(res) => Ok(RawFile::Gif(res)),
             Err(err) => {
+                if let RawGifError::IO(ref ioerr) = err
+                    && let ErrorKind::NotFound = ioerr.kind()
+                {
+                    info!(
+                        "Raw file not found, creating new with name : {}",
+                        filn.display()
+                    );
+                    return Ok(RawFile::Gif(RawGif::open(&gif::create_resize(
+                        &path, size,
+                    )?)?));
+                }
                 warn!("Error in getting raw: {err}");
-                Ok(RawFile::Gif(RawGif::open(&gif::create_resize(
-                    &filn, size,
-                )?)?))
+                return Err(Box::new(err));
             }
         }
     } else {
@@ -51,10 +60,19 @@ pub fn get_raw(filename: &str, size: (u32, u32)) -> Result<RawFile, Box<dyn Erro
         match RawImage::open(&filn) {
             Ok(res) => Ok(RawFile::Image(res)),
             Err(err) => {
+                if let RawImageError::IO(ref ioerr) = err
+                    && let ErrorKind::NotFound = ioerr.kind()
+                {
+                    info!(
+                        "Raw file not found, creating new with name : {}",
+                        filn.display()
+                    );
+                    return Ok(RawFile::Image(RawImage::open(&image::create_raw(
+                        &path, size,
+                    )?)?));
+                }
                 warn!("Error in getting raw: {err}");
-                Ok(RawFile::Image(RawImage::open(&image::create_raw(
-                    &filn, size,
-                )?)?))
+                return Err(Box::new(err));
             }
         }
     }

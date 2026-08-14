@@ -51,7 +51,7 @@ pub async fn webserver_main() -> Result<(), Box<dyn Error>> {
         .layer(DefaultBodyLimit::max(MAX_SIZE_LIMIT_100MB))
         .fallback(static_handler::static_handler);
 
-    let listener = tokio::net::TcpListener::bind(SERVE_ADDR).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(SERVE_ADDR).await?;
     axum::serve(listener, app).await?;
     Ok(())
 }
