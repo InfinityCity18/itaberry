@@ -60,13 +60,18 @@ pub fn create_raw(
 }
 
 impl RawImage {
-    fn open(path: &Path) -> Result<RawImage, RawImageError> {
+    pub fn open(path: &Path) -> Result<RawImage, RawImageError> {
         let bytes = std::fs::read(path)?;
         let pixels = bytes
             .chunks_exact(2)
             .map(|s| Rgb565::from(RawU16::new(u16::from_be_bytes([s[0], s[1]]))))
             .collect();
         Ok(RawImage { pixels })
+    }
+
+    pub fn raw_filename(filename_no_ext: &str, size: (u32, u32)) -> PathBuf {
+        let formatted = format!("{}_{}x{}.raw", filename_no_ext, size.0, size.1);
+        Path::new(&*ROOT_DIR).join(RAW_DIR).join(formatted)
     }
 }
 

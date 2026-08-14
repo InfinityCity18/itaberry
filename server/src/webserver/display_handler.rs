@@ -1,18 +1,19 @@
-use axum::{Json, extract::State, http::StatusCode};
+use axum::{
+    Json,
+    extract::{Path, State},
+    http::StatusCode,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::webserver::AppState;
+use crate::{display_thread::DisplayCommand, webserver::AppState};
 use tokio::sync::oneshot;
-
-pub enum DisplayCommand {
-    GetDisplaysInfo(oneshot::Sender<Vec<DisplayConfigWeb>>),
-}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DisplayConfigWeb {
     pub id: i32,
     pub model: String,
     pub display_size: (u16, u16),
+    pub current_image: Option<String>,
 }
 
 pub async fn handle_display_names(
@@ -32,4 +33,14 @@ pub async fn handle_display_names(
     Ok(Json(configs))
 }
 
-pub async fn set_display_handler(State(state): State<AppState>) {}
+pub async fn set_display_handler(
+    State(state): State<AppState>,
+    Path((id, filename)): Path<(i32, String)>,
+) -> Result<(), (StatusCode, String)> {
+    state
+        .tx
+        .send(DisplayCommand::SetDisplay(id, filename))
+        .await
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+    Ok(())
+}

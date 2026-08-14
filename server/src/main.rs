@@ -9,6 +9,7 @@ use crate::{
 
 mod constants;
 mod display;
+mod display_thread;
 mod raw;
 mod webserver;
 

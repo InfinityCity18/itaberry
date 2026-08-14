@@ -35,10 +35,10 @@ where
 
 pub fn load_displays_from_config(
     path: &Path,
-) -> Result<Vec<Box<dyn AnyDisplay>>, DisplayLoadError> {
+) -> Result<Vec<Box<dyn AnyDisplay + Send + Sync>>, DisplayLoadError> {
     let file_content_string = std::fs::read_to_string(path)?;
     let display_configs: DisplayConfigRoot = toml::from_str(&file_content_string)?;
-    let displays: Vec<Box<dyn AnyDisplay>> = display_configs
+    let displays: Vec<Box<dyn AnyDisplay + Send + Sync>> = display_configs
         .displayconfig
         .into_iter()
         .map(|conf| {
@@ -47,6 +47,12 @@ pub fn load_displays_from_config(
         })
         .collect::<Result<Vec<_>, _>>()?;
     Ok(displays)
+}
+
+pub fn load_config(path: &Path) -> Result<Vec<DisplayConfig>, DisplayLoadError> {
+    let file_content_string = std::fs::read_to_string(path)?;
+    let display_configs: DisplayConfigRoot = toml::from_str(&file_content_string)?;
+    Ok(display_configs.displayconfig)
 }
 
 #[derive(Error, Debug)]

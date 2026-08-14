@@ -15,6 +15,7 @@ use thiserror::Error;
 
 pub trait AnyDisplay {
     fn id(&self) -> i32;
+    fn size(&self) -> (u32, u32);
     fn display_test_image(&mut self) -> Result<(), DisplayError>;
     fn clear_display(&mut self, color: Rgb565) -> Result<(), DisplayError>;
     fn display_image(&mut self, img: &RawImage) -> Result<(), DisplayError>;
@@ -23,6 +24,10 @@ pub trait AnyDisplay {
 impl AnyDisplay for FakeDisplay {
     fn id(&self) -> i32 {
         self.id
+    }
+
+    fn size(&self) -> (u32, u32) {
+        (240, 240)
     }
 
     fn display_test_image(&mut self) -> Result<(), DisplayError> {
@@ -48,6 +53,10 @@ where
 {
     fn id(&self) -> i32 {
         self.id
+    }
+
+    fn size(&self) -> (u32, u32) {
+        (self.disp.size().width, self.disp.size().height)
     }
 
     fn display_test_image(&mut self) -> Result<(), DisplayError> {

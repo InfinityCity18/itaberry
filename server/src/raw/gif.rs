@@ -15,7 +15,7 @@ use crate::{
 };
 
 pub struct RawGif {
-    frames: Vec<(RawImage, u64)>,
+    pub frames: Vec<(RawImage, u64)>,
 }
 
 pub fn create_resize(
@@ -47,7 +47,7 @@ pub fn create_resize(
 }
 
 impl RawGif {
-    fn open(path: &Path) -> Result<RawGif, RawGifError> {
+    pub fn open(path: &Path) -> Result<RawGif, RawGifError> {
         let f = std::fs::File::open(path)?;
         let mut options = gif::DecodeOptions::new();
         options.set_color_output(gif::ColorOutput::RGBA);
@@ -92,6 +92,11 @@ impl RawGif {
         }
 
         return Ok(RawGif { frames });
+    }
+
+    pub fn raw_filename(filename_no_ext: &str, size: (u32, u32)) -> PathBuf {
+        let formatted = format!("{}_{}x{}.gif", filename_no_ext, size.0, size.1);
+        Path::new(&*ROOT_DIR).join(RAW_DIR).join(formatted)
     }
 }
 

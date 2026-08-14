@@ -17,7 +17,10 @@ use spidev::{SpiModeFlags, Spidev, SpidevOptions};
 use thiserror::Error;
 
 impl DisplayConfig {
-    pub fn build_display(self, id: i32) -> Result<Box<dyn AnyDisplay>, BuildDisplayError> {
+    pub fn build_display(
+        self,
+        id: i32,
+    ) -> Result<Box<dyn AnyDisplay + Send + Sync>, BuildDisplayError> {
         let gpio = Gpio::new()?;
         let mut delay = Delay::new();
         let spidev_device = SpidevDevice(create_spidev(&self)?);
@@ -103,7 +106,8 @@ impl From<DisplayConfig> for DisplayConfigWeb {
         DisplayConfigWeb {
             id: value.id,
             model: value.model.into(),
-            display_size: value.display_size
+            display_size: value.display_size,
+            current_image: None,
         }
     }
 }
