@@ -4,17 +4,22 @@
 
     --rpi-red-color: #c51d4a;
 
+    --rpi-red-color-dark: #8b1534;
+
     --ui-selection-white: #f5f6f9;
 
     --ui-grey-light: #cccccc;
+
+    --dark-background: #282828;
+
+    --black-background: #1a1a1a;
 }
 
 body {
+    background-color: var(--black-background);
     margin: 0;
-    font-size: 2
 }
 
 * {
     font-family: Roboto, ui-sans-serif, system-ui, sans-serif;
-    font-size: 2;
 }

@@ -1,20 +1,23 @@
 <script>
     import displaySrc from "./assets/display.svg";
     import imageLogoSrc from "./assets/image.svg";
-    let activeLeft = $state(true);
+    import { currentpage } from "./shared.svelte.js";
 </script>
 
 <div class="tab-switcher">
-    <button class={["tab", { activeLeft }]} onclick={() => (activeLeft = true)}>
-        <img class="display-logo" src={displaySrc} />
+    <button
+        class={["tab", { activeLeft: currentpage.displays }]}
+        onclick={() => (currentpage.displays = true)}
+    >
+        <img class="display-logo" alt="display logo" src={displaySrc} />
         <span class="label">Displays</span>
     </button>
 
     <button
-        class={["tab", { activeLeft: !activeLeft }]}
-        onclick={() => (activeLeft = false)}
+        class={["tab", { activeLeft: !currentpage.displays }]}
+        onclick={() => (currentpage.displays = false)}
     >
-        <img class="image-logo" src={imageLogoSrc} />
+        <img class="image-logo" alt="images logo" src={imageLogoSrc} />
         <span class="label">Images</span>
     </button>
 </div>
@@ -51,7 +54,6 @@
         transition: all 0.2s ease-in-out;
     }
 
-    /* --- Active Tab Styling --- */
     .tab.activeLeft {
         background-color: var(--ui-selection-white);
         color: var(--rpi-red-color);

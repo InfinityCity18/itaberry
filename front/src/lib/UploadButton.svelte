@@ -1,17 +1,17 @@
 <script>
     import uploadIcon from "./assets/upload.svg";
-    let files = $state();
+    import { uploaded_files } from "./shared.svelte.js";
 </script>
 
 <label class="upload-button">
     <input
         multiple
-        bind:files
+        bind:files={uploaded_files.files}
         accept=".webp, .png, .jpeg, .jpg, .gif"
         id="file-upload"
         type="file"
     />
-    <img class="upload-icon" src={uploadIcon} />
+    <img class="upload-icon" alt="upload icon" src={uploadIcon} />
     <span>Upload a photo or a gif</span>
 </label>
 
