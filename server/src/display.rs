@@ -59,7 +59,7 @@ pub fn load_config(path: &Path) -> Result<Vec<DisplayConfig>, DisplayLoadError> 
 pub enum DisplayLoadError {
     #[error("Failed to open config file")]
     Io(#[from] std::io::Error),
-    #[error("Failed to parse toml config")]
+    #[error("Failed to parse toml config : {0}")]
     TomlParse(#[from] toml::de::Error),
     #[error(transparent)]
     BuildDisplay(#[from] BuildDisplayError),

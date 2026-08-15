@@ -1,7 +1,9 @@
 use axum::{extract::Path, http::StatusCode};
+use tracing::{info, instrument};
 
 use crate::constants::{OG_DIR, RAW_DIR, ROOT_DIR};
 
+#[instrument]
 pub async fn delete_handler(
     Path(query_filename): Path<String>,
 ) -> Result<StatusCode, (StatusCode, String)> {
@@ -64,6 +66,7 @@ pub async fn delete_handler(
     }
 
     if deleted_once {
+        info!("Successfully deleted file: {query_filename}");
         Ok(StatusCode::OK)
     } else {
         Ok(StatusCode::NOT_FOUND)

@@ -9,3 +9,7 @@ export const fetched_files = $state({
 export const uploaded_files = $state({
     files: new DataTransfer().files
 })
+
+export const images_filenames = $state({
+    filenames: []
+})

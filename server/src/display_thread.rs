@@ -3,17 +3,16 @@ use std::{
     error::Error,
     path::Path,
     sync::{Arc, Mutex, mpsc},
-    thread::JoinHandle,
     time::Duration,
 };
 
 use tokio::sync::oneshot;
-use tracing::{error, info, trace, warn};
+use tracing::{error, info, warn};
 
 use crate::{
     constants::ROOT_DIR,
     display::{AnyDisplay, load_config, load_displays_from_config},
-    raw::{RawFile, RawImage, get_raw},
+    raw::{RawFile, get_raw},
     webserver::DisplayConfigWeb,
 };
 
@@ -32,7 +31,7 @@ pub fn display_thread(
         .collect();
 
     //let displays = load_displays_from_config(&Path::new(&*ROOT_DIR).join("config.toml"))?;
-    let displays: Vec<Box<crate::display::FakeDisplay>> = (2..3)
+    let displays: Vec<Box<crate::display::FakeDisplay>> = (1..6)
         .map(|id| Box::new(crate::display::FakeDisplay { id }))
         .collect();
     let mut worker_channels: HashMap<i32, mpsc::Sender<String>> = HashMap::new();

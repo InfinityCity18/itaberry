@@ -2,45 +2,13 @@
     import ImageFrame from "./ImageFrame.svelte";
     import { blur } from "svelte/transition";
     import { uploaded_files } from "./shared.svelte.js";
-    import { currentpage } from "./shared.svelte.js";
-
-    /**
-     * @type {String[]}
-     */
-    let images = $state([]);
+    import { images_filenames } from "./shared.svelte.js";
 
     $effect(() => {
         fetch("/api/images")
             .then((res) => res.json())
-            .then((data) => (images = data));
+            .then((data) => (images_filenames.filenames = data));
     });
-
-    $effect(() => {
-        if (uploaded_files.files.length > 0) {
-            currentpage.displays = false; //change current page to images so the user can now see the uploaded images
-            Array.from(uploaded_files.files).forEach((file) => {
-                handleUpload(file);
-            });
-            uploaded_files.files = new DataTransfer().files;
-        }
-    });
-
-    /**
-     * @param {File} file
-     */
-    async function handleUpload(file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        try {
-            await fetch(`/api/upload`, {
-                method: "POST",
-                body: formData,
-            });
-            images.push(file.name);
-        } catch (err) {
-            console.error("Upload failed:", err);
-        }
-    }
 
     /**
      * @param {string} filename
@@ -51,7 +19,9 @@
                 method: "DELETE",
             });
             if (res.ok) {
-                images = images.filter((img) => img !== filename);
+                images_filenames.filenames = images_filenames.filenames.filter(
+                    (img) => img !== filename,
+                );
             }
         } catch (err) {
             console.error("Failed to delete image:", err);
@@ -62,7 +32,7 @@
 <div transition:blur class="gallery-section">
     <div class="gallery-wrapper">
         <div class="gallery">
-            {#each images as image (image)}
+            {#each images_filenames.filenames as image (image)}
                 <ImageFrame filename={image} {onDelete} />
             {/each}
         </div>

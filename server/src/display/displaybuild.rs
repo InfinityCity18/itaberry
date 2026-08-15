@@ -9,7 +9,7 @@ use linux_embedded_hal::SpidevDevice;
 use mipidsi::{
     Builder,
     interface::SpiInterface,
-    models::{GC9A01, ST7789},
+    models::{GC9A01, ST7735s, ST7789},
 };
 use rppal::{gpio::Gpio, hal::Delay};
 use serde::{Deserialize, Serialize};
@@ -47,6 +47,19 @@ impl DisplayConfig {
             }
             DisplayModelConfig::St7789 => {
                 let displ = Builder::new(ST7789, interface)
+                    .color_order(self.color_order)
+                    .display_offset(self.display_offset.0, self.display_offset.1)
+                    .display_size(self.display_size.0, self.display_size.1)
+                    .invert_colors(self.inversion)
+                    .orientation(self.orientation)
+                    .reset_pin(rst)
+                    .init(&mut delay)
+                    .map_err(|e| BuildDisplayError::Init(format!("{:?}", e)))?;
+                let displayo = Display { id, disp: displ };
+                Ok(Box::new(displayo))
+            }
+            DisplayModelConfig::St7735 => {
+                let displ = Builder::new(ST7735s, interface)
                     .color_order(self.color_order)
                     .display_offset(self.display_offset.0, self.display_offset.1)
                     .display_size(self.display_size.0, self.display_size.1)
@@ -151,6 +164,7 @@ pub enum RotationDef {
 pub enum DisplayModelConfig {
     Gc9a01,
     St7789,
+    St7735,
 }
 
 impl Into<String> for DisplayModelConfig {
@@ -158,6 +172,7 @@ impl Into<String> for DisplayModelConfig {
         match self {
             DisplayModelConfig::Gc9a01 => String::from("GC9A01"),
             DisplayModelConfig::St7789 => String::from("ST7789"),
+            DisplayModelConfig::St7735 => String::from("ST7735"),
         }
     }
 }
