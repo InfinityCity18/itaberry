@@ -1,0 +1,6 @@
+"Reference","Qty","Value","DNP","Exclude from BOM","Exclude from Board","Footprint","Datasheet"
+"J1","1","Raspberry_Pi_4","","","","Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical","https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-datasheet.pdf"
+"J2","1","ST7735 128x128 8pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical","~"
+"J3,J4","2","GC9A01 240x240 7pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical","~"
+"J5","1","GC9A01 240x240 8pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical","~"
+"J7","1","ST7789 240x280 8pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical","~"
