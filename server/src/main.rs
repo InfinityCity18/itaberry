@@ -2,10 +2,7 @@ use std::{error::Error, path::Path};
 
 use tracing::Level;
 
-use crate::{
-    constants::{OG_DIR, RAW_DIR, ROOT_DIR},
-    display::{AnyDisplay, FakeDisplay, load_displays_from_config},
-};
+use crate::constants::{OG_DIR, RAW_DIR, ROOT_DIR};
 
 mod constants;
 mod display;
@@ -19,8 +16,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     tracing_subscriber::fmt()
         .with_max_level(Level::TRACE)
         .init();
-    let mut displays: Vec<Box<FakeDisplay>> =
-        (1..5).map(|id| Box::new(FakeDisplay { id })).collect();
     webserver::webserver_main().await?;
     Ok(())
 }

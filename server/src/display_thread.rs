@@ -3,7 +3,7 @@ use std::{
     error::Error,
     path::Path,
     sync::{Arc, Mutex, mpsc},
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 use tokio::sync::oneshot;
@@ -30,15 +30,15 @@ pub fn display_thread(
         .map(|conf| Arc::new(Mutex::new(conf.into())))
         .collect();
 
-    //let displays = load_displays_from_config(&Path::new(&*ROOT_DIR).join("config.toml"))?;
-    let displays: Vec<Box<crate::display::FakeDisplay>> = (1..6)
-        .map(|id| Box::new(crate::display::FakeDisplay { id }))
-        .collect();
+    let displays = load_displays_from_config(&Path::new(&*ROOT_DIR).join("config.toml"))?;
+    // let displays: Vec<Box<crate::display::FakeDisplay>> = (1..6)
+    //     .map(|id| Box::new(crate::display::FakeDisplay { id }))
+    //     .collect();
     let mut worker_channels: HashMap<i32, mpsc::Sender<String>> = HashMap::new();
     for (disp, conf) in displays.into_iter().zip(configs.iter()) {
         let arc = conf.clone();
         let (tx, rx) = mpsc::channel();
-        assert_eq!(conf.lock().unwrap().id, disp.id);
+        assert_eq!(conf.lock().unwrap().id, disp.id());
         if worker_channels.insert(disp.id(), tx).is_some() {
             warn!("Displays were assigned equal ids, overwritten display may not receive commands");
         }
@@ -98,6 +98,8 @@ fn worker_thread(
                     }
                     RawFile::Gif(rawgif) => {
                         for (rawimage, frame_time) in rawgif.frames.iter().cycle() {
+                            let start = Instant::now();
+
                             if let Err(e) = disp.display_image(rawimage) {
                                 warn!("Displaying image (gif) error : {e}");
                             }
@@ -105,7 +107,12 @@ fn worker_thread(
                                 buf = Some(new_filename);
                                 break;
                             }
-                            std::thread::sleep(Duration::from_millis(*frame_time));
+                            let elapsed = start.elapsed();
+                            let target = Duration::from_millis(*frame_time);
+
+                            if target > elapsed {
+                                std::thread::sleep(target - elapsed);
+                            }
                         }
                     }
                 }

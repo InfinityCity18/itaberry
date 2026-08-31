@@ -3,11 +3,11 @@ use image::{GenericImageView, ImageError};
 use std::{
     ffi::OsStr,
     format,
-    fs::create_dir_all,
     io::Write,
     path::{Path, PathBuf},
 };
 use thiserror::Error;
+use tracing::info;
 
 use crate::constants::{RAW_DIR, ROOT_DIR};
 
@@ -31,10 +31,21 @@ pub fn create_raw(
     let out_dir = Path::new(&*ROOT_DIR).join(RAW_DIR);
     let output_path = out_dir.join(filename);
 
+    info!(
+        "BEFORE RESIZE SIZE NOW IS {} x {}",
+        img.width(),
+        img.height()
+    );
+
     let resized = img.resize_to_fill(
         target_width,
         target_height,
         image::imageops::FilterType::Triangle,
+    );
+    info!(
+        "RESIZED SIZE NOW IS {} x {}",
+        resized.width(),
+        resized.height()
     );
 
     let mut raw_bytes = Vec::with_capacity((target_width * target_height * 2) as usize);
@@ -83,6 +94,4 @@ pub enum RawImageError {
     Image(#[from] ImageError),
     #[error("Couldn't get the file name of original file")]
     Filename,
-    #[error("OsStr contained invalid characters")]
-    OsStr,
 }

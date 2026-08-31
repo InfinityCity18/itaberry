@@ -2,8 +2,6 @@ use embedded_graphics::pixelcolor::{Rgb565, RgbColor};
 use gif::DecodingError;
 use std::{
     ffi::OsStr,
-    fs::create_dir_all,
-    io::ErrorKind,
     path::{Path, PathBuf},
     process::{Command, ExitStatus},
 };
@@ -24,7 +22,6 @@ pub fn create_resize(
     og_gif_path: &Path,
     (target_width, target_height): (u32, u32),
 ) -> Result<PathBuf, RawGifError> {
-    //gifsicle --resize-fit 240x240 input.gif -o scaled_240x240.gif
     let mut filename = og_gif_path
         .file_prefix()
         .ok_or(RawGifError::Filename)?
@@ -35,16 +32,19 @@ pub fn create_resize(
     )));
     let out_dir = Path::new(&*ROOT_DIR).join(RAW_DIR);
     let out_path = out_dir.join(filename);
-    let status = Command::new("gifsicle")
-        .arg("--resize-fit")
-        .arg(format!("{}x{}", target_width, target_height))
+    let status = Command::new("ffmpeg")
+        .arg("-i")
         .arg(og_gif_path)
-        .arg("-o")
+        .arg("-loglevel")
+        .arg("fatal")
+        .arg("-filter_complex")
+        .arg(format!("[0:v]scale={0}:{1}:force_original_aspect_ratio=increase,crop={0}:{1},split[a][b];[a]palettegen[p];[b][p]paletteuse", target_width, target_height))
+        .arg("-y")
         .arg(&out_path)
         .status()?;
     if !status.success() {
-        warn!("Gifsicle failed");
-        return Err(RawGifError::Gifsicle(status));
+        warn!("Ffmpeg failed");
+        return Err(RawGifError::Ffmpeg(status));
     }
     Ok(out_path)
 }
@@ -58,7 +58,7 @@ impl RawGif {
         let mut decoder = options.read_info(f)?;
         let (width, height) = (decoder.width(), decoder.height());
 
-        let mut current_frame: Vec<Rgb565> = vec![Rgb565::BLACK; (width * height) as usize];
+        let mut current_frame: Vec<Rgb565> = vec![Rgb565::BLACK; width as usize * height as usize];
         let mut frames = Vec::new();
 
         while let Some(frame) = decoder.read_next_frame()? {
@@ -73,20 +73,25 @@ impl RawGif {
             let frame_width = frame.width as usize;
 
             for (i, chunk) in frame.buffer.chunks_exact(4).enumerate() {
-                let r = chunk[0];
-                let g = chunk[1];
-                let b = chunk[2];
+                let a = chunk[3];
+                if a >= 128 {
+                    let r = chunk[0];
+                    let g = chunk[1];
+                    let b = chunk[2];
 
-                let r5 = r >> 3;
-                let g6 = g >> 2;
-                let b5 = b >> 3;
+                    let r5 = r >> 3;
+                    let g6 = g >> 2;
+                    let b5 = b >> 3;
 
-                let pixel_color = Rgb565::new(r5, g6, b5);
+                    let pixel_color = Rgb565::new(r5, g6, b5);
 
-                let x = frame_left + (i % frame_width);
-                let y = frame_top + (i / frame_width);
+                    let x = frame_left + (i % frame_width);
+                    let y = frame_top + (i / frame_width);
 
-                current_frame[y * width as usize + x] = pixel_color;
+                    if x < width.into() && y < height.into() {
+                        current_frame[y * width as usize + x] = pixel_color;
+                    }
+                }
             }
             let rawimg = RawImage {
                 pixels: current_frame.clone(),
@@ -111,6 +116,6 @@ pub enum RawGifError {
     ReadGif(#[from] DecodingError),
     #[error("Couldn't get the file name of original file")]
     Filename,
-    #[error("Gifsicle failed with status : {0}")]
-    Gifsicle(ExitStatus),
+    #[error("Ffmpeg failed with status : {0}")]
+    Ffmpeg(ExitStatus),
 }

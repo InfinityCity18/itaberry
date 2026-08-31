@@ -6,7 +6,7 @@ use rust_embed::Embed;
 use tracing::{error, instrument, trace};
 
 #[derive(Embed)]
-#[folder = "../front/dist/"]
+#[folder = "dist/"]
 struct Dist;
 
 #[instrument]

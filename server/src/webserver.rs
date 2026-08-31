@@ -9,7 +9,7 @@ use std::{error::Error, process};
 use tracing::error;
 
 use axum::{
-    Json, Router,
+    Router,
     extract::DefaultBodyLimit,
     routing::{delete, get, post},
 };

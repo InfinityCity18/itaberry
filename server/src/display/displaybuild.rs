@@ -26,7 +26,7 @@ impl DisplayConfig {
         let spidev_device = SpidevDevice(create_spidev(&self)?);
 
         let dc = gpio.get(self.dc_pin)?.into_output();
-        let rst = gpio.get(self.reset_pin)?.into_output();
+        //let rst = gpio.get(self.reset_pin)?.into_output();
         let buffer: &'static mut [u8] = Box::leak(Box::new([0; BUFFER_SIZE]));
 
         let interface = SpiInterface::new(spidev_device, dc, buffer);
@@ -39,7 +39,6 @@ impl DisplayConfig {
                     .display_size(self.display_size.0, self.display_size.1)
                     .invert_colors(self.inversion)
                     .orientation(self.orientation)
-                    .reset_pin(rst)
                     .init(&mut delay)
                     .map_err(|e| BuildDisplayError::Init(format!("{:?}", e)))?;
                 let displayo = Display { id, disp: displ };
@@ -52,7 +51,6 @@ impl DisplayConfig {
                     .display_size(self.display_size.0, self.display_size.1)
                     .invert_colors(self.inversion)
                     .orientation(self.orientation)
-                    .reset_pin(rst)
                     .init(&mut delay)
                     .map_err(|e| BuildDisplayError::Init(format!("{:?}", e)))?;
                 let displayo = Display { id, disp: displ };
@@ -65,7 +63,6 @@ impl DisplayConfig {
                     .display_size(self.display_size.0, self.display_size.1)
                     .invert_colors(self.inversion)
                     .orientation(self.orientation)
-                    .reset_pin(rst)
                     .init(&mut delay)
                     .map_err(|e| BuildDisplayError::Init(format!("{:?}", e)))?;
                 let displayo = Display { id, disp: displ };

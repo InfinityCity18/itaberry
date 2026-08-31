@@ -5,6 +5,7 @@ use std::path::Path;
 
 use displaybuild::DisplayConfig;
 use mipidsi::{
+    NoResetPin,
     interface::{InterfacePixelFormat, SpiInterface},
     models::Model,
 };
@@ -16,10 +17,6 @@ pub use crate::display::{
     displaybuild::{BuildDisplayError, DisplayConfigRoot},
 };
 
-pub struct FakeDisplay {
-    pub id: i32,
-}
-
 struct Display<'a, MODEL>
 where
     MODEL: Model,
@@ -29,7 +26,7 @@ where
     pub disp: mipidsi::Display<
         SpiInterface<'a, linux_embedded_hal::SpidevDevice, gpio::OutputPin>,
         MODEL,
-        gpio::OutputPin,
+        NoResetPin,
     >,
 }
 
