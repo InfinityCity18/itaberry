@@ -77,6 +77,7 @@ fn create_spidev(conf: &DisplayConfig) -> Result<Spidev, SpidevError> {
         "/dev/spidev{}.{}",
         conf.controller_id, conf.chipselect_id
     ))?;
+
     let options = SpidevOptions::new()
         .bits_per_word(8)
         .max_speed_hz(SPI_CLOCK_SPEED_HZ)
@@ -96,7 +97,6 @@ pub struct DisplayConfigRoot {
 pub struct DisplayConfig {
     pub id: i32,
     model: DisplayModelConfig,
-    reset_pin: u8,
     dc_pin: u8,
     controller_id: u8,
     chipselect_id: u8,

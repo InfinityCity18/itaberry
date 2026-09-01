@@ -112,6 +112,8 @@ fn worker_thread(
 
                             if target > elapsed {
                                 std::thread::sleep(target - elapsed);
+                            } else {
+                                std::thread::sleep(Duration::from_millis(2));
                             }
                         }
                     }
